@@ -1,0 +1,214 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: Arial, sans-serif;
+}
+
+body {
+    background-color: #f4f6f9;
+    color: #333;
+}
+
+/* ─── NAVBAR ─── */
+nav {
+    background-color: #1a252f;
+    padding: 18px 30px;
+}
+
+nav h1 {
+    color: white;
+    font-size: 20px;
+}
+
+/* ─── CONTAINER ─── */
+.container {
+    max-width: 1100px;
+    margin: 30px auto;
+    padding: 0 20px;
+}
+
+/* ─── INFO BOX ─── */
+.info-box {
+    background: #eaf4fb;
+    border-left: 5px solid #2980b9;
+    padding: 15px 20px;
+    border-radius: 6px;
+    margin-bottom: 25px;
+    font-size: 14px;
+    line-height: 1.6;
+}
+
+/* ─── CONTROLES ─── */
+.controles {
+    background: white;
+    padding: 25px;
+    border-radius: 10px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+    margin-bottom: 25px;
+    display: flex;
+    align-items: flex-end;
+    gap: 20px;
+    flex-wrap: wrap;
+}
+
+.campo label {
+    display: block;
+    font-size: 13px;
+    font-weight: bold;
+    color: #555;
+    margin-bottom: 6px;
+}
+
+.campo select {
+    padding: 10px 14px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    font-size: 14px;
+    background: #fafafa;
+    min-width: 160px;
+}
+
+.botoes {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+button {
+    padding: 10px 18px;
+    border: none;
+    border-radius: 6px;
+    font-size: 14px;
+    cursor: pointer;
+    transition: opacity 0.2s;
+}
+
+button:hover { opacity: 0.85; }
+
+.btn-verde    { background: #27ae60; color: white; }
+.btn-vermelho { background: #e74c3c; color: white; }
+.btn-cinza    { background: #95a5a6; color: white; }
+.btn-cinza.pequeno { padding: 6px 12px; font-size: 12px; }
+
+/* ─── CARDS ─── */
+.cards {
+    display: flex;
+    gap: 15px;
+    margin-bottom: 25px;
+    flex-wrap: wrap;
+}
+
+.card {
+    background: white;
+    border-radius: 10px;
+    padding: 20px 25px;
+    flex: 1;
+    min-width: 150px;
+    text-align: center;
+    font-size: 14px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+    border-top: 4px solid #95a5a6;
+}
+
+.card strong {
+    display: block;
+    font-size: 28px;
+    margin-top: 5px;
+}
+
+.card.azul    { border-top-color: #2980b9; }
+.card.verde   { border-top-color: #27ae60; }
+.card.vermelho { border-top-color: #e74c3c; }
+
+/* ─── PAINEIS ─── */
+.paineis {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    margin-bottom: 25px;
+}
+
+.painel {
+    background: white;
+    border-radius: 10px;
+    padding: 20px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+}
+
+.painel h2 {
+    font-size: 15px;
+    color: #2c3e50;
+    margin-bottom: 15px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #eee;
+}
+
+/* ─── TAREFAS ─── */
+.tarefa {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    padding: 10px 12px;
+    border-radius: 6px;
+    margin-bottom: 6px;
+    font-size: 13px;
+}
+
+.tarefa.aguardando  { background: #fef9e7; border-left: 4px solid #f39c12; }
+.tarefa.processando { background: #eaf4fb; border-left: 4px solid #2980b9; }
+
+.tid    { font-weight: bold; color: #555; min-width: 55px; }
+.tuser  { flex: 1; }
+.tstatus { font-size: 12px; color: #777; }
+
+.vazio {
+    color: #aaa;
+    font-size: 13px;
+    padding: 10px 0;
+}
+
+/* ─── LOG ─── */
+.log-container {
+    background: white;
+    border-radius: 10px;
+    padding: 20px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+}
+
+.log-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+}
+
+.log-header h2 {
+    font-size: 16px;
+    color: #2c3e50;
+}
+
+.log-item {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    padding: 10px 14px;
+    border-radius: 6px;
+    margin-bottom: 6px;
+    font-size: 13px;
+    flex-wrap: wrap;
+}
+
+.log-sucesso { background: #d4edda; border-left: 4px solid #27ae60; }
+.log-erro    { background: #fdecea; border-left: 4px solid #e74c3c; }
+
+.log-hora   { color: #888; min-width: 80px; }
+.log-id     { font-weight: bold; min-width: 60px; }
+.log-user   { min-width: 90px; }
+.log-status { font-weight: bold; min-width: 70px; }
+.log-msg    { flex: 1; }
+
+/* ─── RESPONSIVO ─── */
+@media (max-width: 700px) {
+    .paineis { grid-template-columns: 1fr; }
+}

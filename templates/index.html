@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Fila de Requisições</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+<nav>
+    <h1>📋 Fila de Requisições</h1>
+</nav>
+
+<div class="container">
+
+    <!-- EXPLICAÇÃO -->
+    <div class="info-box">
+        <strong>Como funciona:</strong> Cada requisição entra numa fila e é processada
+        na ordem de chegada. A fila suporta até <strong>10 tarefas simultâneas</strong>.
+        Cada tarefa leva <strong>2 segundos</strong> para ser processada.
+        Se a fila estiver cheia, a requisição é rejeitada com erro <strong>503</strong>.
+    </div>
+
+    <!-- CONTROLES -->
+    <div class="controles">
+        <div class="campo">
+            <label>Usuário</label>
+            <select id="user_id">
+                <option value="usuario_1">Usuário 1</option>
+                <option value="usuario_2">Usuário 2</option>
+                <option value="usuario_3">Usuário 3</option>
+            </select>
+        </div>
+        <div class="botoes">
+            <button onclick="adicionar()" class="btn-verde">📨 Adicionar 1 Tarefa</button>
+            <button onclick="sobrecarregar()" class="btn-vermelho">⚡ Disparar 15 de uma vez</button>
+            <button onclick="resetar()" class="btn-cinza">🔄 Resetar</button>
+        </div>
+    </div>
+
+    <!-- CONTADORES -->
+    <div class="cards" id="contadores">
+        <div class="card">
+            ⏳ Aguardando<br>
+            <strong id="total-fila">0</strong>
+        </div>
+        <div class="card azul">
+            ⚙️ Processando<br>
+            <strong id="total-proc">0</strong>
+        </div>
+        <div class="card verde">
+            ✅ Concluídas<br>
+            <strong id="total-conc">0</strong>
+        </div>
+        <div class="card vermelho">
+            ❌ Rejeitadas<br>
+            <strong id="total-rej">0</strong>
+        </div>
+    </div>
+
+    <!-- PAINEL DE TAREFAS -->
+    <div class="paineis">
+
+        <!-- FILA DE ESPERA -->
+        <div class="painel">
+            <h2>⏳ Aguardando</h2>
+            <div id="fila-lista"></div>
+        </div>
+
+        <!-- PROCESSANDO -->
+        <div class="painel">
+            <h2>⚙️ Processando</h2>
+            <div id="proc-lista"></div>
+        </div>
+
+    </div>
+
+    <!-- LOG -->
+    <div class="log-container">
+        <div class="log-header">
+            <h2>📋 Log de Tarefas</h2>
+            <button onclick="limparLog()" class="btn-cinza pequeno">Limpar</button>
+        </div>
+        <div id="log"></div>
+    </div>
+
+</div>
+
+<script>
+    // Atualiza o status a cada 500ms automaticamente
+    setInterval(atualizarStatus, 500);
+
+    async function adicionar() {
+        const user_id = document.getElementById("user_id").value;
+        const response = await fetch("/adicionar", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ user_id })
+        });
+        const data = await response.json();
+        adicionarLog(data, response.status);
+    }
+
+    async function sobrecarregar() {
+        const user_id = document.getElementById("user_id").value;
+        const promises = Array.from({ length: 15 }, () =>
+            fetch("/adicionar", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ user_id })
+            }).then(r => r.json().then(d => ({ data: d, status: r.status })))
+        );
+        const results = await Promise.all(promises);
+        results.forEach(r => adicionarLog(r.data, r.status));
+    }
+
+    async function atualizarStatus() {
+        const response = await fetch("/status");
+        const data = await response.json();
+
+        // Atualiza contadores
+        document.getElementById("total-fila").textContent = data.total_fila;
+        document.getElementById("total-proc").textContent = data.total_proc;
+        document.getElementById("total-conc").textContent = data.total_conc;
+        document.getElementById("total-rej").textContent  = data.total_rej;
+
+        // Atualiza fila de espera
+        const filaLista = document.getElementById("fila-lista");
+        filaLista.innerHTML = data.fila.length === 0
+            ? '<p class="vazio">Nenhuma tarefa aguardando</p>'
+            : data.fila.map(t => `
+                <div class="tarefa aguardando">
+                    <span class="tid">#${t.id}</span>
+                    <span class="tuser">${t.user_id}</span>
+                    <span class="tstatus">⏳ Posição ${t.posicao}</span>
+                </div>`).join("");
+
+        // Atualiza processando
+        const procLista = document.getElementById("proc-lista");
+        procLista.innerHTML = data.processando.length === 0
+            ? '<p class="vazio">Nenhuma tarefa sendo processada</p>'
+            : data.processando.map(t => `
+                <div class="tarefa processando">
+                    <span class="tid">#${t.id}</span>
+                    <span class="tuser">${t.user_id}</span>
+                    <span class="tstatus">⚙️ Processando...</span>
+                </div>`).join("");
+    }
+
+    async function resetar() {
+        await fetch("/resetar");
+        document.getElementById("log").innerHTML = "";
+        atualizarStatus();
+    }
+
+    function adicionarLog(data, status) {
+        const log = document.getElementById("log");
+        const cor = data.allowed ? "log-sucesso" : "log-erro";
+        const agora = new Date().toLocaleTimeString("pt-br");
+        const tarefa = data.tarefa;
+        log.innerHTML = `
+            <div class="log-item ${cor}">
+                <span class="log-hora">${agora}</span>
+                <span class="log-id">#${tarefa.id}</span>
+                <span class="log-user">${tarefa.user_id}</span>
+                <span class="log-status">HTTP ${status}</span>
+                <span class="log-msg">${data.message}</span>
+            </div>
+        ` + log.innerHTML;
+    }
+
+    function limparLog() {
+        document.getElementById("log").innerHTML = "";
+    }
+</script>
+
+</body>
+</html>
